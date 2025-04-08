@@ -7,8 +7,32 @@ import (
 	"strings"
 )
 
-func main()  {
+type cliCommands struct {
+	name        string
+	description string
+	callback    func() error
+}
+
+var availableCommands map[string]cliCommands
+
+func init() {
+	availableCommands = map[string]cliCommands{
+		"exit": {
+			name:        "exit",
+			description: "Exit the pockedex",
+			callback:    commandExit,
+		},
+		"help": {
+			name:        "help",
+			description: "Displays a help message",
+			callback:    commandHelp,
+		},
+	}
+}
+
+func main() {
 	scanner := bufio.NewScanner(os.Stdin)
+
 	for {
 		fmt.Print("Pokedex > ")
 		scanner.Scan()
@@ -17,12 +41,38 @@ func main()  {
 		firstWord := ""
 		if len(clearedInput) >= 1 {
 			firstWord = clearedInput[0]
-		}	
-		fmt.Println("Your command was: " + firstWord)
+		}
+
+		command, ok := availableCommands[firstWord]
+		if !ok {
+			fmt.Println("Unknown command")
+			continue
+		}
+
+		err := command.callback()
+		if err != nil {
+			fmt.Println("Error executing command: %w", err)
+		}
 	}
 }
 
-func cleanInput(text string) []string  {
+func commandExit() error {
+	fmt.Println("Closing the Pokedex... Goodbye!")
+	os.Exit(0)
+	return nil
+}
+
+func commandHelp() error {
+	fmt.Println("Welcome to the Pokedex!")
+	fmt.Println("Usage:")
+	fmt.Println("")
+	for _, v := range availableCommands {
+		fmt.Printf("%s: %s\n", v.name, v.description)
+	}
+	return nil
+}
+
+func cleanInput(text string) []string {
 	text = strings.Trim(text, " ")
 	textSlice := strings.Split(text, " ")
 	var returnSlice []string
@@ -35,6 +85,6 @@ func cleanInput(text string) []string  {
 
 		returnSlice = append(returnSlice, strings.ToLower(v))
 	}
-	
+
 	return returnSlice
 }
