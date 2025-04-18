@@ -5,12 +5,15 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"time"
+
+	"github.com/L0PE/pokedexcli/internal/pokeapi"
 )
 
 type cliCommands struct {
 	name        string
 	description string
-	callback    func() error
+	callback    func(conf *config) error
 }
 
 var availableCommands map[string]cliCommands
@@ -27,11 +30,24 @@ func init() {
 			description: "Displays a help message",
 			callback:    commandHelp,
 		},
+		"map": {
+			name: "map",
+			description: "Get names of local Areas",
+			callback: commandMap,
+		},
+		"mapb": {
+			name: "mapb",
+			description: "Get names of local Areas",
+			callback: commandMapb,
+		},
 	}
 }
 
 func main() {
 	scanner := bufio.NewScanner(os.Stdin)
+	conf := config{
+		PokeapiClient: pokeapi.NewClient(5 * time.Second),
+	}
 
 	for {
 		fmt.Print("Pokedex > ")
@@ -49,20 +65,20 @@ func main() {
 			continue
 		}
 
-		err := command.callback()
+		err := command.callback(&conf)
 		if err != nil {
-			fmt.Println("Error executing command: %w", err)
+			fmt.Printf("Error executing command: %v \n", err)
 		}
 	}
 }
 
-func commandExit() error {
+func commandExit(_ *config) error {
 	fmt.Println("Closing the Pokedex... Goodbye!")
 	os.Exit(0)
 	return nil
 }
 
-func commandHelp() error {
+func commandHelp(_ *config) error {
 	fmt.Println("Welcome to the Pokedex!")
 	fmt.Println("Usage:")
 	fmt.Println("")
