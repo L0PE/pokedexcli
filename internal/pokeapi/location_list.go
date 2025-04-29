@@ -13,18 +13,23 @@ func (c *Client) ListLocation(pageURL *string) (PokeapiReponse, error) {
 	if pageURL != nil {
 		url = *pageURL
 	}
+	
+	data, ok := c.cache.Get(url)
+	if !ok {
+		response, err := c.httpClient.Get(url)
+		if err != nil {
+			return PokeapiReponse{}, fmt.Errorf("Error during making reuest: %w", err)
+		}
 
-	response, err := c.httpClient.Get(url)
-	if err != nil {
-		return PokeapiReponse{}, fmt.Errorf("Error during making reuest: %w", err)
-	}
+		defer response.Body.Close()
 
-	defer response.Body.Close()
+		data, err = io.ReadAll(response.Body)
+		if err != nil {
+			return PokeapiReponse{}, fmt.Errorf("Error during reading data: %w", err)
+		}
 
-	data, err := io.ReadAll(response.Body)
-	if err != nil {
-		return PokeapiReponse{}, fmt.Errorf("Error during reading data: %w", err)
-	}
+		c.cache.Add(url, data)
+ 	}
 
 	var pokeapiResponse PokeapiReponse
 	if err := json.Unmarshal(data, &pokeapiResponse); err != nil {
