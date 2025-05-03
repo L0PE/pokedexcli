@@ -6,11 +6,11 @@ import (
 	"github.com/L0PE/pokedexcli/internal/pokeapi"
 )
 
-func commandMap(conf *config) error  {
+func commandMap(conf *config, _ []string) error  {
 	return baseMap(conf, conf.Next)
 }
 
-func commandMapb(conf *config) error {
+func commandMapb(conf *config, _ []string) error {
 	if conf.Previous == nil {
 		return fmt.Errorf("You are allready on a friest page")
 	}

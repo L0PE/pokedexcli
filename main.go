@@ -13,7 +13,7 @@ import (
 type cliCommands struct {
 	name        string
 	description string
-	callback    func(conf *config) error
+	callback    func(conf *config, arguments []string) error
 }
 
 var availableCommands map[string]cliCommands
@@ -40,6 +40,11 @@ func init() {
 			description: "Get names of local Areas",
 			callback: commandMapb,
 		},
+		"explore": {
+			name: "explore",
+			description: "Explore location by given name",
+			callback: commandExplore,
+		},
 	}
 }
 
@@ -65,20 +70,20 @@ func main() {
 			continue
 		}
 
-		err := command.callback(&conf)
+		err := command.callback(&conf, clearedInput[1:])
 		if err != nil {
 			fmt.Printf("Error executing command: %v \n", err)
 		}
 	}
 }
 
-func commandExit(_ *config) error {
+func commandExit(_ *config, _ []string) error {
 	fmt.Println("Closing the Pokedex... Goodbye!")
 	os.Exit(0)
 	return nil
 }
 
-func commandHelp(_ *config) error {
+func commandHelp(_ *config, _ []string) error {
 	fmt.Println("Welcome to the Pokedex!")
 	fmt.Println("Usage:")
 	fmt.Println("")
