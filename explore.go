@@ -9,7 +9,7 @@ func commandExplore(conf *config, argumets []string) error {
 
 		name := argumets[0]
 
-		response, err := conf.PokeapiClient.ExploreLocation(name) //TODO: update with actual
+		response, err := conf.PokeapiClient.ExploreLocation(name)
 		if err != nil {
 			return err
 		}

@@ -45,6 +45,11 @@ func init() {
 			description: "Explore location by given name",
 			callback: commandExplore,
 		},
+		"catch": {
+			name: "catch",
+			description: "Try to catch the pokemon by given name",
+			callback: commandCatch,
+		},
 	}
 }
 
@@ -52,6 +57,7 @@ func main() {
 	scanner := bufio.NewScanner(os.Stdin)
 	conf := config{
 		PokeapiClient: pokeapi.NewClient(5 * time.Second),
+		Pokedex: make(map[string]pokeapi.Pokemon),
 	}
 
 	for {
